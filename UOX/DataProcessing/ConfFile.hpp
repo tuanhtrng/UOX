@@ -49,6 +49,7 @@ private:
 public:
     ConfFile();
     ~ConfFile() = default;
+    void loadDirectory(const std::string& path);
     
     void loadFile(const std::string& filepath);
     std::vector<KeyValue> valueFor(const std::string& keypath) ;

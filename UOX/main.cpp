@@ -25,11 +25,15 @@ int main(int argc, const char * argv[]) {
     std::string configpath(argv[1]) ;
     std::ifstream configstream;
     ConfFile config ;
+    
+    /*
     config.loadFile(configpath);
     auto value = config.valueFor("network.name") ;
     for (auto i = 0; i< value.size();++i) {
         std::cout <<"Value for network.name is: "<<value[i].listvalues()<<std::endl;
     }
+    */
+    config.loadDirectory("/Users/charle/Documents");
     
     
     

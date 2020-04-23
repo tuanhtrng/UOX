@@ -12,6 +12,7 @@
 #include <cstring>
 #include <regex>
 #include <vector>
+#include <filesystem>
 
 
 #include "StringFunctions.hpp"
@@ -24,6 +25,16 @@
 
 
 ConfFile::ConfFile() {
+    
+}
+//=====================================================
+void ConfFile::loadDirectory(const std::string &path){
+    for (auto &iter: std::filesystem::recursive_directory_iterator(path) ) {
+        if (iter.is_directory()) {
+            loadFile( iter.path());
+        }
+        
+    }
     
 }
 //=====================================================
@@ -40,7 +51,12 @@ void ConfFile::loadFile(const std::string &filepath){
     }
     // We need to the any values
     
-    values = ConfSection::parsevalues(data);
+    auto tempvalues = ConfSection::parsevalues(data);
+    std::multimap<std::string, KeyValue>::iterator iter = tempvalues.begin();
+    while (iter != tempvalues.end() ) {
+        values.insert(*iter) ;
+        iter++;
+    }
 }
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // Remove all the comments, and the spaces before/after lines.
@@ -182,3 +198,4 @@ std::vector<KeyValue> ConfFile::valueFor(const std::string &keypath) {
     }
     return vrvalue;
 }
+
