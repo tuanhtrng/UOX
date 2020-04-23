@@ -11,7 +11,6 @@
 #include <fstream>
 
 // Third party
-#include "json.h"
 
 // Our includes
 #include "ConfFile.hpp"

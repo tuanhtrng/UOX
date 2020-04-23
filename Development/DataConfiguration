@@ -1,0 +1,68 @@
+So how does the text processing work.
+
+The concept is fairly straightforward.
+
+We expect text files to have the following format
+
+{ sectionname:
+
+    key = value;
+}
+
+That is the base format. Now a few other notes:
+1. Sections can be nested in sections.
+2. Line comments are indicated by "//".  Anything after a "//" is ignored
+3. Values can be comprised of multiple values, seperated by a ","
+4. value can be null, and just the key can be present (no trailing = is needed).
+5. Lines can can be continued if the last character on the line is a trailing "\"
+
+And a few constraints:
+1. A line can not exceed 4094 characters
+2. Values are either text, or numbers
+
+A file, does not require a "section" at the top level.  Depening on the particualar
+file, this may or not make a difference. But for text parsing a file can look
+like this:
+"FILE CONTENTS"
+
+key = value1
+key2 = value,value,value
+{section1:
+   key = value
+   key = value
+   {subsection1:
+      key = value
+    }
+}
+key3 = value
+{section2:
+   key = value
+}
+
+This example, as three top level key,value pairs at the "file" level, two
+sections (section1 and section2), with those having key,value pairs. Section1
+has one subsection.
+
+
+Now in the code, what makes this all work
+
+class KeyValue:
+   This contains the values for any key. It will indicate the value count,
+   and the type of each value
+class ConfSection
+   This contains a section, and it values. It also has any subsections (so
+   nesting of ConfSection occurs)
+class ConfFile
+   THis contains the data for a given file. It has flie level values, and holds
+   any top level sections in that file.
+   
+what is a keypath?  a keypath looks like the following: "key1.key2.key3".  That
+would reference section with name key1, subsection name key2 of section key1, and
+finally return the vlaue for key3 in subsction key2.
+
+
+That is the concept.  A few things I dont like or hae right now:
+1. no since of a "arrays" of comple values. Such a value being mulktple
+subsections in of it self.
+2. The handling of duplicate keys in a section (will probably addrss this).
+
