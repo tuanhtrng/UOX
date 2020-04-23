@@ -143,3 +143,39 @@ std::tuple<std::string,std::vector<std::string>> ConfFile::sections(std::string&
     }
     return {value,section} ;
 }
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+KeyValue ConfFile::valueFor(const std::string &keypath) {
+    // NOTE:  THis is essentially duplicated in ConfFile as well
+    // So changes here should be made there as well
+    auto keys = keypath;
+    auto key = ConfSection::parsekeys(keys) ;
+    KeyValue rvalue ;
+    
+    
+    
+    
+    if (keys.size() == 0) {
+        // it is a value lookup
+        try {
+            rvalue = values.at(key);
+        }
+        catch(...) {
+            // The key doesn't exist!
+            throw std::runtime_error(std::string("Nonexisting key: ")+key);
+        }
+    }
+    else {
+        // Ok, is a section we have to get;
+        try {
+            //std::cout <<"Look for section: " << key<<std::endl;
+            auto sec = secvalues.at(key) ;
+            //std::cout << "looking for value (in section) for : " <<keys<<std::endl;
+            rvalue = sec.valueFor(keys);
+            
+        }
+        catch(...) {
+            throw;
+        }
+    }
+    return rvalue;
+}

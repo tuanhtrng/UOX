@@ -71,7 +71,7 @@ std::string ConfSection::getname(std::string &secstring){
         if (rvalue.size() == 0) {
             throw std::runtime_error("Section has no name");
         }
-        secstring.erase(0,loc);
+        secstring.erase(0,loc+1);
     }
     return rvalue;
 }
@@ -124,7 +124,11 @@ std::map<std::string,KeyValue> ConfSection::parsevalues(std::string& secstring){
         if (line.size() > 0) {
             
             auto rvalue = parseline(line);
-            values.insert(std::make_pair(std::get<0>(rvalue), std::get<1>(rvalue)));
+            if (std::get<0>(rvalue).size() > 0) {
+                //std::cout <<"Adding key:"<<std::get<0>(rvalue)<<":"<<std::get<1>(rvalue).listvalues()<<":"<<std::endl;
+                values.insert(std::make_pair(std::get<0>(rvalue), std::get<1>(rvalue)));
+            }
+            
         }
         
     }
@@ -142,6 +146,7 @@ std::tuple<std::string,KeyValue> ConfSection::parseline(const std::string &line)
     else {
         
         std::string key = line.substr(0,loc) ;
+        trim(key);
         loc = loc + 1 ; // move past the =
         KeyValue value; ;
         
@@ -161,6 +166,67 @@ std::tuple<std::string,KeyValue> ConfSection::parseline(const std::string &line)
         
         return {key,value};
     }
+}
+//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+std::string ConfSection::parsekeys(std::string &keys){
+    std::string key ;
+    if (keys.size() == 0) {
+        throw std::runtime_error("Key path was empty") ;
+    }
+    auto loc = keys.find_first_of(".") ;
+    if (loc != std::string::npos) {
+        key = keys.substr(0,loc) ;
+        keys.erase(0,loc+1) ;
+    }
+    else {
+        key = keys ;
+        keys.erase(0,keys.size()) ;
+    }
+    return key ;
+}
+
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+KeyValue ConfSection::valueFor(const std::string &keypath) {
+    // NOTE:  THis is essentially duplicated in ConfFile as well
+    // So changes here should be made there as well
     
+    /*
+    //Debug to see what we have in values
+    std::map<std::string,KeyValue>::iterator iter = values.begin();
+
+    std::cout <<"Debug values are:"<<std::endl;
+    while (iter != values.end()){
+        std::cout <<"key:"<<iter->first <<": value is: " <<iter->second.listvalues()<<std::endl;
+        iter++;
+    }
+    std::cout <<"Finish debug values"<<std::endl;
+     */
     
+    auto keys = keypath;
+    auto key = ConfSection::parsekeys(keys) ;
+    KeyValue rvalue ;
+    if (keys.size() == 0) {
+        
+        // it is a value lookup
+        try {
+            rvalue = values.at(key);
+        }
+        catch(...) {
+            // The key doesn't exist!
+            
+            throw std::runtime_error(std::string("Nonexisting key: ")+key);
+        }
+    }
+    else {
+        // Ok, is a section we have to get;
+        try {
+            auto sec = subsections.at(key) ;
+            rvalue = sec.valueFor(keys);
+            
+        }
+        catch(...) {
+            throw;
+        }
+    }
+    return rvalue;
 }

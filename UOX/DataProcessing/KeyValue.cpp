@@ -50,6 +50,7 @@ std::vector<std::string> KeyValue::argsFor(std::string value) {
     while (true) {
         try {
             auto rvalue = parseString(value);
+            //trim(rvalue);
             values.push_back(rvalue);
         }
         catch(...){

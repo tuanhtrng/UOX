@@ -22,7 +22,7 @@ public:
     ConfSection(const std::string& secstring);
     virtual ~ConfSection() ;
     std::string key();
-    
+    KeyValue valueFor(const std::string& keypath) ;
 private:
     std::map<std::string,ConfSection> subsections;
     std::map<std::string, KeyValue> values;
@@ -34,6 +34,8 @@ private:
     std::string getname(std::string& secstring);
     static std::map<std::string,KeyValue> parsevalues(std::string& secstring);
     static std::tuple<std::string,KeyValue> parseline(const std::string& line);
+    static std::string parsekeys(std::string &keys);
+    
     friend class ConfFile;
 };
 

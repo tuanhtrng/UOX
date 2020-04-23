@@ -50,7 +50,7 @@ public:
     ~ConfFile() = default;
     
     void loadFile(const std::string& filepath);
-
+    KeyValue valueFor(const std::string& keypath) ;
 private:
     std::string prepdata(const std::string& filepath);
     static secaddr findSection(const std::string& value);
