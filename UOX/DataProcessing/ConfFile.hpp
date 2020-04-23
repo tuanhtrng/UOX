@@ -11,8 +11,12 @@
 
 #include <string>
 #include <sstream>
+#include <map>
 
 
+// Local includes
+#include "KeyValue.hpp"
+#include "ConfSection.hpp"
 
 class ConfFile {
 private:
@@ -37,7 +41,9 @@ private:
             return (start != std::string::npos) && (end != std::string::npos);
         }
     };
-    std::stringstream data;
+    
+    std::map<std::string,KeyValue> values ;
+    std::map<std::string,ConfSection> secvalues;
 
 public:
     ConfFile();
@@ -46,9 +52,11 @@ public:
     void loadFile(const std::string& filepath);
 
 private:
-    secaddr findSection(const std::string& value);
-    std::tuple<std::string,std::vector<std::string>> sections(std::string value);
+    std::string prepdata(const std::string& filepath);
+    static secaddr findSection(const std::string& value);
+    static std::tuple<std::string,std::vector<std::string>> sections(std::string& value);
     
+    friend class ConfSection;
 };
 
 

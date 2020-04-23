@@ -13,7 +13,6 @@
 #include <string>
 
 // Third party
-#include "json.h"
 
 class Configuration {
 public:
@@ -44,7 +43,6 @@ public:
     
 private:
     std::string filepath;
-    Json::Value root;
     
 };
 

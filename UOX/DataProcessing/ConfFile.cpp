@@ -28,6 +28,25 @@ ConfFile::ConfFile() {
 }
 //=====================================================
 void ConfFile::loadFile(const std::string &filepath){
+    
+    std::string data = prepdata(filepath);
+    
+    auto rvalue = sections(data);
+    
+    for (std::size_t i=0;i<std::get<1>(rvalue).size();i++) {
+        
+        ConfSection sec(std::get<1>(rvalue)[i]) ;
+        secvalues.insert(std::make_pair(sec.key(), sec));
+    }
+    // We need to the any values
+    
+    values = ConfSection::parsevalues(data);
+}
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+// Remove all the comments, and the spaces before/after lines.
+// Add \n after each line, to perserve line endings, for later parsing
+//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+std::string ConfFile::prepdata(const std::string &filepath) {
     std::ifstream file ;
     file.open(filepath) ;
     if (!file.is_open()) {
@@ -35,8 +54,8 @@ void ConfFile::loadFile(const std::string &filepath){
     }
     
     std::string temp;
-    data.str("");
-    auto buffersize = 4096;
+    std::stringstream data;
+    const int buffersize = 4096;
     char buffer[buffersize];
     while (!file.eof()) {
         std::memset(buffer, 0, buffersize);
@@ -45,17 +64,18 @@ void ConfFile::loadFile(const std::string &filepath){
         remcomment(line);
         trim(line);
         if (line.size() > 0) {
-            data << line << "\n" ;
+            // Check to see if their is a ending continuation mark
+            if (line[line.size()-1] == '\\') {
+                line.erase(line.size()-1,1);
+                data << line <<" ";
+            }
+            else {
+                data << line << "\n" ;
+            }
+            
         }
     }
-    
-    auto rvalue = sections(data.str());
-    //std::cout << "Found " << std::get<1>(rvalue).size() <<" sections"<<std::endl;
-    for (std::size_t i=0;i<std::get<1>(rvalue).size();i++) {
-        std::cout <<"SECTION" <<std::endl;
-        std::cout << std::get<1>(rvalue)[i] << std::endl;
-    }
-    
+    return data.str();
 }
 //====================================================================
 ConfFile::secaddr ConfFile::findSection(const std::string& value) {
@@ -107,20 +127,19 @@ ConfFile::secaddr ConfFile::findSection(const std::string& value) {
 }
 
 //===============================================================
-std::tuple<std::string,std::vector<std::string>> ConfFile::sections(std::string value) {
+std::tuple<std::string,std::vector<std::string>> ConfFile::sections(std::string& value) {
     std::vector<std::string> section;
     
-    auto addr = findSection(value) ;
+    auto addr = ConfFile::findSection(value) ;
     
     while (addr.valid()) {
         
         // We found at least one section!
-        auto sec = value.substr(addr.start+1,(addr.end - addr.start)-2 ) ;
-        
+        auto sec = value.substr(addr.start+1,(addr.end - addr.start) - 1 ) ;
         
         section.push_back(sec);
-        value.erase(addr.start,addr.end - addr.start);
-        addr = findSection(value);
+        value.erase(addr.start,(addr.end - addr.start) + 1);
+        addr = ConfFile::findSection(value);
     }
     return {value,section} ;
 }

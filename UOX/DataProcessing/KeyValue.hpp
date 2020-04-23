@@ -10,7 +10,7 @@
 #define KeyValue_hpp
 
 #include <string>
-
+#include <cstring>
 #include <vector>
 
 
@@ -22,6 +22,7 @@ public:
     ~KeyValue() = default;
     std::size_t argcount() const ;
     std::string valueFor(int index) ;
+    std::string listvalues() ;
     
 private:
     std::vector<std::string> values;
@@ -29,6 +30,7 @@ private:
 private:
     void loadValues(const std::string& value) ;
     std::string parseString(std::string& value);
+    std::vector<std::string> argsFor(std::string value);
 };
 
 #endif /* KeyValue_hpp */
