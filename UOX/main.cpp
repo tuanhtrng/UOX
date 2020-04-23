@@ -27,7 +27,10 @@ int main(int argc, const char * argv[]) {
     ConfFile config ;
     config.loadFile(configpath);
     auto value = config.valueFor("network.name") ;
-    std::cout <<"Value for network.name is: "<<value.listvalues()<<std::endl;
+    for (auto i = 0; i< value.size();++i) {
+        std::cout <<"Value for network.name is: "<<value[i].listvalues()<<std::endl;
+    }
+    
     
     
     

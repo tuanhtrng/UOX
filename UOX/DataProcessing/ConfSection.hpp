@@ -12,6 +12,7 @@
 #include <map>
 #include <string>
 #include <tuple>
+#include <vector>
 
 #include "KeyValue.hpp"
 #include "ConfFile.hpp"
@@ -22,17 +23,17 @@ public:
     ConfSection(const std::string& secstring);
     virtual ~ConfSection() ;
     std::string key();
-    KeyValue valueFor(const std::string& keypath) ;
+    std::vector<KeyValue> valueFor(const std::string& keypath) ;
 private:
     std::map<std::string,ConfSection> subsections;
-    std::map<std::string, KeyValue> values;
+    std::multimap<std::string, KeyValue> values;
     std::string name;
     
 private:
     
     void loadsection(std::string& secstring);
     std::string getname(std::string& secstring);
-    static std::map<std::string,KeyValue> parsevalues(std::string& secstring);
+    static std::multimap<std::string,KeyValue> parsevalues(std::string& secstring);
     static std::tuple<std::string,KeyValue> parseline(const std::string& line);
     static std::string parsekeys(std::string &keys);
     

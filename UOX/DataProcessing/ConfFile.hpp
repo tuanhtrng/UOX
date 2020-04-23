@@ -12,6 +12,7 @@
 #include <string>
 #include <sstream>
 #include <map>
+#include <vector>
 
 
 // Local includes
@@ -42,7 +43,7 @@ private:
         }
     };
     
-    std::map<std::string,KeyValue> values ;
+    std::multimap<std::string,KeyValue> values ;
     std::map<std::string,ConfSection> secvalues;
 
 public:
@@ -50,7 +51,7 @@ public:
     ~ConfFile() = default;
     
     void loadFile(const std::string& filepath);
-    KeyValue valueFor(const std::string& keypath) ;
+    std::vector<KeyValue> valueFor(const std::string& keypath) ;
 private:
     std::string prepdata(const std::string& filepath);
     static secaddr findSection(const std::string& value);

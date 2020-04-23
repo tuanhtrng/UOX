@@ -144,24 +144,27 @@ std::tuple<std::string,std::vector<std::string>> ConfFile::sections(std::string&
     return {value,section} ;
 }
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-KeyValue ConfFile::valueFor(const std::string &keypath) {
+std::vector<KeyValue> ConfFile::valueFor(const std::string &keypath) {
     // NOTE:  THis is essentially duplicated in ConfFile as well
     // So changes here should be made there as well
     auto keys = keypath;
     auto key = ConfSection::parsekeys(keys) ;
     KeyValue rvalue ;
-    
+    std::vector<KeyValue> vrvalue;
     
     
     
     if (keys.size() == 0) {
         // it is a value lookup
-        try {
-            rvalue = values.at(key);
-        }
-        catch(...) {
-            // The key doesn't exist!
+        
+        auto range = values.equal_range(key);
+
+        if (range.first  == range.second) {
             throw std::runtime_error(std::string("Nonexisting key: ")+key);
+        }
+        // We know the key exists, and we should have the iterator to the first one
+        for (auto itr = range.first; itr != range.second; ++itr) {
+            vrvalue.push_back(itr->second);
         }
     }
     else {
@@ -170,12 +173,12 @@ KeyValue ConfFile::valueFor(const std::string &keypath) {
             //std::cout <<"Look for section: " << key<<std::endl;
             auto sec = secvalues.at(key) ;
             //std::cout << "looking for value (in section) for : " <<keys<<std::endl;
-            rvalue = sec.valueFor(keys);
+            vrvalue = sec.valueFor(keys);
             
         }
         catch(...) {
             throw;
         }
     }
-    return rvalue;
+    return vrvalue;
 }

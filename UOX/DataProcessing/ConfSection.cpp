@@ -77,14 +77,14 @@ std::string ConfSection::getname(std::string &secstring){
 }
 
 //+++++++++++++++++++++++++++++++++++++++++
-std::map<std::string,KeyValue> ConfSection::parsevalues(std::string& secstring){
+std::multimap<std::string,KeyValue> ConfSection::parsevalues(std::string& secstring){
     // we look for =
     std::stringstream input ;
     
     input.str(secstring);
     const int buffersize = 4096;
     char buffer[buffersize];
-    std::map<std::string,KeyValue> values;
+    std::multimap<std::string,KeyValue> values;
     std::string line;
     bool concat = false;
     while (!input.eof()) {
@@ -186,47 +186,37 @@ std::string ConfSection::parsekeys(std::string &keys){
 }
 
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-KeyValue ConfSection::valueFor(const std::string &keypath) {
+std::vector<KeyValue> ConfSection::valueFor(const std::string &keypath) {
     // NOTE:  THis is essentially duplicated in ConfFile as well
     // So changes here should be made there as well
     
-    /*
-    //Debug to see what we have in values
-    std::map<std::string,KeyValue>::iterator iter = values.begin();
-
-    std::cout <<"Debug values are:"<<std::endl;
-    while (iter != values.end()){
-        std::cout <<"key:"<<iter->first <<": value is: " <<iter->second.listvalues()<<std::endl;
-        iter++;
-    }
-    std::cout <<"Finish debug values"<<std::endl;
-     */
-    
+    std::vector<KeyValue> vrvalue;
     auto keys = keypath;
     auto key = ConfSection::parsekeys(keys) ;
     KeyValue rvalue ;
     if (keys.size() == 0) {
         
-        // it is a value lookup
-        try {
-            rvalue = values.at(key);
-        }
-        catch(...) {
-            // The key doesn't exist!
-            
+        auto range = values.equal_range(key);
+
+        if (range.first  == range.second) {
             throw std::runtime_error(std::string("Nonexisting key: ")+key);
         }
+        // We know the key exists, and we should have the iterator to the first one
+        for (auto itr = range.first; itr != range.second; ++itr) {
+            vrvalue.push_back(itr->second);
+        }
+        
     }
     else {
         // Ok, is a section we have to get;
         try {
             auto sec = subsections.at(key) ;
-            rvalue = sec.valueFor(keys);
+            vrvalue = sec.valueFor(keys);
             
         }
         catch(...) {
             throw;
         }
     }
-    return rvalue;
+    return vrvalue;
 }
