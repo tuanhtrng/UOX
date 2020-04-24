@@ -21,7 +21,6 @@ class ConfSection {
 public:
     ConfSection() ;
     ConfSection(const std::string& secstring);
-    virtual ~ConfSection() ;
     std::string key();
     std::vector<KeyValue> valueFor(const std::string& keypath) ;
 private:

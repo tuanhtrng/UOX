@@ -17,11 +17,6 @@
 #include "StringFunctions.hpp"
 
 //======================= Constructor/Destructor ================
-//++++++++++++++++++++++++++++++++++++
-ConfSection::~ConfSection(){
-    subsections.clear();
-    values.clear();
-}
 //+++++++++++++++++++++++++++++++++++++
 ConfSection::ConfSection() {
     subsections.clear();
