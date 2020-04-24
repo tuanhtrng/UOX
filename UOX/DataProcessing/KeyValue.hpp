@@ -19,7 +19,6 @@ class KeyValue {
 public:
     KeyValue() ;
     KeyValue(const std::string& value) ;
-    ~KeyValue() = default;
     std::size_t argcount() const ;
     std::string valueFor(int index) ;
     std::string listvalues() ;

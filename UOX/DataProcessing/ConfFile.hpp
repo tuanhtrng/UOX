@@ -48,7 +48,6 @@ private:
 
 public:
     ConfFile();
-    ~ConfFile() = default;
     void loadDirectory(const std::string& path);
     
     void loadFile(const std::string& filepath);
