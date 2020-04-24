@@ -22,14 +22,14 @@
 class ConfFile {
 private:
     struct secaddr {
-        secaddr() {
-            start = std::string::npos;
-            end = std::string::npos;
-        }
-        secaddr(std::size_t start, std::size_t end) {
-            this->start = start ;
-            this->end = end ;
-        }
+        secaddr()
+            : start(std::string::npos)
+            , end(std::string::npos) {}
+
+        secaddr(std::size_t start, std::size_t end)
+            : start(start)
+            , end(end) {}
+
         std::size_t start ;
         std::size_t end;
         bool contains(const secaddr& value) {
